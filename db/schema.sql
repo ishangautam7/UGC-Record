@@ -7,7 +7,7 @@ CREATE TYPE "ProjectStatus" AS ENUM (
     'APPROVED', 
     'REJECTED', 
     'AUDITED', 
-    'ONGOING',
+    'IN_PROGRESS',
     'COMPLETED'
 );
 

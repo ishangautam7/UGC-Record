@@ -1,0 +1,190 @@
+.container {
+    display: flex;
+    min-height: 100vh;
+    background: linear-gradient(135deg, #0f0f1a 0%, #1a1a2e 50%, #16213e 100%);
+}
+
+.main {
+    flex: 1;
+    margin-left: 280px;
+    min-height: 100vh;
+    overflow-x: hidden;
+}
+
+.dashboard {
+    padding: 2rem;
+}
+
+.header {
+    margin-bottom: 2rem;
+}
+
+.header h1 {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 0.5rem;
+}
+
+.roleDisplay {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.roleBadge {
+    padding: 0.25rem 0.75rem;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #fff;
+}
+
+.loading {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 50vh;
+    color: #888;
+    font-size: 1.1rem;
+}
+
+.statsGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.statCard {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+    padding: 1.5rem;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 16px;
+    backdrop-filter: blur(10px);
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.statCard:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+}
+
+.statIcon {
+    font-size: 2.5rem;
+    padding: 0.75rem;
+    background: rgba(102, 126, 234, 0.2);
+    border-radius: 12px;
+}
+
+.statContent h3 {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #fff;
+    margin: 0;
+}
+
+.statContent p {
+    color: #888;
+    margin: 0.25rem 0;
+}
+
+.statBreakdown {
+    display: flex;
+    gap: 1rem;
+    font-size: 0.8rem;
+    margin-top: 0.5rem;
+}
+
+.statBreakdown .pending {
+    color: #f59e0b;
+}
+
+.statBreakdown .approved {
+    color: #10b981;
+}
+
+.section {
+    margin-top: 2rem;
+}
+
+.section h2 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #fff;
+    margin-bottom: 1rem;
+}
+
+.empty {
+    color: #666;
+    text-align: center;
+    padding: 2rem;
+}
+
+.recentList {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.recentItem {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 1.5rem;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 12px;
+    transition: background 0.2s;
+}
+
+.recentItem:hover {
+    background: rgba(255, 255, 255, 0.06);
+}
+
+.recentInfo h4 {
+    margin: 0;
+    color: #fff;
+    font-weight: 500;
+}
+
+.recentInfo .dept {
+    font-size: 0.8rem;
+    color: #888;
+}
+
+.status {
+    padding: 0.25rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.status[data-status="PENDING"] {
+    background: rgba(245, 158, 11, 0.2);
+    color: #f59e0b;
+}
+
+.status[data-status="APPROVED"] {
+    background: rgba(16, 185, 129, 0.2);
+    color: #10b981;
+}
+
+.status[data-status="IN_PROGRESS"] {
+    background: rgba(59, 130, 246, 0.2);
+    color: #3b82f6;
+}
+
+.status[data-status="COMPLETED"] {
+    background: rgba(139, 92, 246, 0.2);
+    color: #8b5cf6;
+}
+
+.status[data-status="CANCELLED"] {
+    background: rgba(239, 68, 68, 0.2);
+    color: #ef4444;
+}
