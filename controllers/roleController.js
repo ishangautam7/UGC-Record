@@ -24,11 +24,11 @@ exports.getRoleById = async (req, res) => {
 };
 
 exports.createRole = async (req, res) => {
-    const { name, description, permissions } = req.body;
+    const { name, description } = req.body;
     try {
         const { rows } = await db.query(
-            'INSERT INTO "Role" (name, description, permissions) VALUES ($1, $2, $3) RETURNING *',
-            [name, description, JSON.stringify(permissions || [])]
+            'INSERT INTO "Role" (name, description) VALUES ($1, $2) RETURNING *',
+            [name, description]
         );
         res.status(201).json(rows[0]);
     } catch (err) {
@@ -38,11 +38,11 @@ exports.createRole = async (req, res) => {
 };
 
 exports.updateRole = async (req, res) => {
-    const { name, description, permissions } = req.body;
+    const { name, description } = req.body;
     try {
         const { rows } = await db.query(
-            'UPDATE "Role" SET name = $1, description = $2, permissions = $3 WHERE id = $4 RETURNING *',
-            [name, description, JSON.stringify(permissions || []), req.params.id]
+            'UPDATE "Role" SET name = $1, description = $2 WHERE id = $3 RETURNING *',
+            [name, description, req.params.id]
         );
         if (rows.length === 0) {
             return res.status(404).json({ error: 'Role not found' });

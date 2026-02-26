@@ -3,7 +3,7 @@ const db = require('../db/index.js');
 exports.getAllColleges = async (req, res) => {
     try {
         const { rows } = await db.query(`
-            SELECT c.*, c.total_students,
+            SELECT c.*,
                    (SELECT COUNT(*) FROM "Department" d WHERE d.college_id = c.id) as department_count,
                    (SELECT COUNT(*) FROM "User" u 
                     JOIN "Department" d ON u.dept_id = d.id 
@@ -21,7 +21,7 @@ exports.getAllColleges = async (req, res) => {
 exports.getCollegeById = async (req, res) => {
     try {
         const { rows } = await db.query(`
-            SELECT c.*, c.total_students,
+            SELECT c.*,
                    (SELECT COUNT(*) FROM "Department" d WHERE d.college_id = c.id) as department_count
             FROM "College" c
             WHERE c.id = $1
@@ -47,7 +47,7 @@ exports.getCollegeById = async (req, res) => {
 };
 
 exports.createCollege = async (req, res) => {
-    const { name, code, address, total_students } = req.body;
+    const { name, code, address } = req.body;
 
     if (!name || !code) {
         return res.status(400).json({ error: 'Name and code are required' });
@@ -55,8 +55,8 @@ exports.createCollege = async (req, res) => {
 
     try {
         const { rows } = await db.query(
-            `INSERT INTO "College" (name, code, address, total_students) VALUES ($1, $2, $3, $4) RETURNING *`,
-            [name, code.toUpperCase(), address, total_students || 0]
+            `INSERT INTO "College" (name, code, address) VALUES ($1, $2, $3) RETURNING *`,
+            [name, code.toUpperCase(), address]
         );
 
         await db.query(
@@ -76,7 +76,7 @@ exports.createCollege = async (req, res) => {
 };
 
 exports.updateCollege = async (req, res) => {
-    const { name, code, address, is_active, total_students } = req.body;
+    const { name, code, address, is_active } = req.body;
     try {
         const oldCollege = await db.query('SELECT * FROM "College" WHERE id = $1', [req.params.id]);
         if (oldCollege.rows.length === 0) {
@@ -89,10 +89,9 @@ exports.updateCollege = async (req, res) => {
                  code = COALESCE($2, code),
                  address = COALESCE($3, address),
                  is_active = COALESCE($4, is_active),
-                 total_students = COALESCE($5, total_students),
                  updated_at = NOW()
-             WHERE id = $6 RETURNING *`,
-            [name, code?.toUpperCase(), address, is_active, total_students, req.params.id]
+             WHERE id = $5 RETURNING *`,
+            [name, code?.toUpperCase(), address, is_active, req.params.id]
         );
 
         await db.query(

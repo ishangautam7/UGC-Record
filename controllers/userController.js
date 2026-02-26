@@ -3,7 +3,7 @@ const db = require('../db/index.js');
 exports.getAllUsers = async (req, res) => {
     try {
         let query = `
-            SELECT u.id, u.name, u.email, u.department, u.is_active, u.created_at, u.last_login,
+            SELECT u.id, u.name, u.email, u.is_active, u.created_at, u.last_login,
                    u.dept_id, d.name as department_name, d.college_id, c.name as college_name,
                    array_agg(r.name) as roles
             FROM "User" u
@@ -38,7 +38,7 @@ exports.getAllUsers = async (req, res) => {
 exports.getUserById = async (req, res) => {
     try {
         const { rows } = await db.query(`
-            SELECT u.id, u.name, u.email, u.department, u.is_active, u.created_at,
+            SELECT u.id, u.name, u.email, u.is_active, u.created_at,
                    u.dept_id, d.name as department_name, c.name as college_name,
                    array_agg(r.name) as roles
             FROM "User" u
@@ -61,17 +61,16 @@ exports.getUserById = async (req, res) => {
 };
 
 exports.updateUser = async (req, res) => {
-    const { name, department, is_active, dept_id } = req.body;
+    const { name, is_active, dept_id } = req.body;
     try {
         const { rows } = await db.query(
             `UPDATE "User" 
              SET name = COALESCE($1, name), 
-                 department = COALESCE($2, department),
-                 is_active = COALESCE($3, is_active),
-                 dept_id = COALESCE($4, dept_id),
+                 is_active = COALESCE($2, is_active),
+                 dept_id = COALESCE($3, dept_id),
                  updated_at = NOW()
-             WHERE id = $5 RETURNING id, name, email, department, is_active, dept_id`,
-            [name, department, is_active, dept_id, req.params.id]
+             WHERE id = $4 RETURNING id, name, email, is_active, dept_id`,
+            [name, is_active, dept_id, req.params.id]
         );
         if (rows.length === 0) {
             return res.status(404).json({ error: 'User not found' });

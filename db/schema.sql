@@ -7,7 +7,7 @@ CREATE TYPE "ProjectStatus" AS ENUM (
     'APPROVED', 
     'REJECTED', 
     'AUDITED', 
-    'IN_PROGRESS',
+    'ONGOING',
     'COMPLETED'
 );
 
@@ -45,7 +45,7 @@ CREATE TABLE "User" (
     "name" VARCHAR(100) NOT NULL,
     "email" VARCHAR(100) NOT NULL UNIQUE, 
     "password" VARCHAR(255) NOT NULL,
-    "department" VARCHAR(100), 
+    "dept_id" UUID REFERENCES "Department"("id"),
 
     "is_active" BOOLEAN DEFAULT TRUE,
     "last_login" TIMESTAMP,
@@ -57,11 +57,12 @@ CREATE TABLE "User" (
 CREATE TRIGGER update_user_time BEFORE UPDATE ON "User"
 FOR EACH ROW EXECUTE FUNCTION update_updated_at();
 
+CREATE INDEX IF NOT EXISTS idx_user_dept ON "User"("dept_id");
+
 CREATE TABLE "Role" (
     "id" UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
     "name" VARCHAR(50) NOT NULL UNIQUE,
     "description" TEXT,
-    "permissions" JSONB DEFAULT '[]',
     "created_at" TIMESTAMP DEFAULT NOW(),
     "updated_at" TIMESTAMP DEFAULT NOW()
 );
@@ -78,7 +79,7 @@ CREATE TABLE "Permission" (
 
 CREATE TABLE "UserRole" (
     "user_id" UUID NOT NULL REFERENCES "User"("id") ON DELETE CASCADE,
-    "role_id" UUID NOT NULL REFERENCES "Role"("id") ON DELETE CASCADE, -- Fixed typo: IN -> ON
+    "role_id" UUID NOT NULL REFERENCES "Role"("id") ON DELETE CASCADE,
     PRIMARY KEY ("user_id", "role_id")
 );
 
@@ -88,10 +89,24 @@ CREATE TABLE "_RolePermission" (
     PRIMARY KEY ("A", "B")
 );
 
+CREATE TABLE "College" (
+    "id" UUID NOT NULL DEFAULT uuid_generate_v4() PRIMARY KEY,
+    "name" VARCHAR(200) NOT NULL UNIQUE,
+    "code" VARCHAR(20) NOT NULL UNIQUE,
+    "address" TEXT,
+    "is_active" BOOLEAN DEFAULT TRUE,
+    "created_at" TIMESTAMP DEFAULT NOW(),
+    "updated_at" TIMESTAMP DEFAULT NOW()
+);
+
+CREATE TRIGGER update_college_updated_at BEFORE UPDATE ON "College"
+FOR EACH ROW EXECUTE FUNCTION update_updated_at();
+
 CREATE TABLE "Department" (
     "id" UUID NOT NULL DEFAULT uuid_generate_v4() PRIMARY KEY,
     "name" VARCHAR(100) NOT NULL,
     "code" TEXT NOT NULL UNIQUE,
+    "college_id" UUID REFERENCES "College"("id") ON DELETE CASCADE,
 
     "created_at" TIMESTAMP DEFAULT NOW(),
     "updated_at" TIMESTAMP DEFAULT NOW()
@@ -99,6 +114,8 @@ CREATE TABLE "Department" (
 
 CREATE TRIGGER update_department_time BEFORE UPDATE ON "Department"
 FOR EACH ROW EXECUTE FUNCTION update_updated_at();
+
+CREATE INDEX IF NOT EXISTS idx_department_college ON "Department"("college_id");
 
 CREATE TABLE "ResearcherProfile" (
     "id" UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
@@ -156,7 +173,7 @@ FOR EACH ROW EXECUTE FUNCTION update_updated_at();
 CREATE TABLE "Expense" (
     "id" UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
     "project_id" UUID NOT NULL REFERENCES "Project"("id") ON DELETE CASCADE,
-    "filed_by" UUID NOT NULL REFERENCES "ResearcherProfile"("id") ON DELETE CASCADE,
+    "filed_by" UUID NOT NULL REFERENCES "User"("id") ON DELETE CASCADE,
     "bill_date" TIMESTAMP NOT NULL,
     "category" TEXT NOT NULL,
     "amount" DECIMAL(15, 2) NOT NULL,
@@ -181,10 +198,19 @@ CREATE TABLE "Document" (
     "id" UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
     "url" TEXT NOT NULL,
     "file_type" TEXT NOT NULL,
-    "uploaded_at" TIMESTAMP DEFAULT NOW(),
-    
-    "project_id" UUID REFERENCES "Project"("id"),
-    "expense_id" UUID REFERENCES "Expense"("id")
+    "uploaded_at" TIMESTAMP DEFAULT NOW()
+);
+
+CREATE TABLE "ProjectDocument" (
+    "project_id" UUID NOT NULL REFERENCES "Project"("id") ON DELETE CASCADE,
+    "document_id" UUID NOT NULL REFERENCES "Document"("id") ON DELETE CASCADE,
+    PRIMARY KEY ("project_id", "document_id")
+);
+
+CREATE TABLE "ExpenseDocument" (
+    "expense_id" UUID NOT NULL REFERENCES "Expense"("id") ON DELETE CASCADE,
+    "document_id" UUID NOT NULL REFERENCES "Document"("id") ON DELETE CASCADE,
+    PRIMARY KEY ("expense_id", "document_id")
 );
 
 CREATE OR REPLACE FUNCTION check_project_budget()
