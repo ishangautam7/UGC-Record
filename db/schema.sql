@@ -45,7 +45,7 @@ CREATE TABLE "User" (
     "name" VARCHAR(100) NOT NULL,
     "email" VARCHAR(100) NOT NULL UNIQUE, 
     "password" VARCHAR(255) NOT NULL,
-    "department" VARCHAR(100), 
+    "dept_id" UUID REFERENCES "Department"("id"),
 
     "is_active" BOOLEAN DEFAULT TRUE,
     "last_login" TIMESTAMP,
