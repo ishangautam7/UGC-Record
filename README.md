@@ -16,7 +16,7 @@ npm install
 Create a `.env` file based on `.env.example`, then run:
 
 ```bash
-npm run dev
+node server.js
 ```
 
 ## Frontend
