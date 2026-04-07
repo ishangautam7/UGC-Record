@@ -80,7 +80,7 @@ exports.getMe = async (req, res) => {
 };
 
 exports.createUser = async (req, res) => {
-    const { name, email, password, department, roleId, dept_id } = req.body;
+    const { name, email, password, roleId, dept_id } = req.body;
 
     if (!name || !email || !password) {
         return res.status(400).json({ error: 'Name, email, and password are required' });
@@ -109,8 +109,8 @@ exports.createUser = async (req, res) => {
         const hashedPassword = await bcrypt.hash(password, salt);
 
         const { rows } = await db.query(
-            'INSERT INTO "User" (name, email, password, department, dept_id) VALUES ($1, $2, $3, $4, $5) RETURNING id, name, email, department, dept_id, created_at',
-            [name, email, hashedPassword, department, userDeptId || null]
+            'INSERT INTO "User" (name, email, password, dept_id) VALUES ($1, $2, $3, $4) RETURNING id, name, email, dept_id, created_at',
+            [name, email, hashedPassword, userDeptId || null]
         );
 
         const user = rows[0];

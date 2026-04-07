@@ -27,48 +27,48 @@ async function seedAll() {
     // 2. Seed Colleges
     console.log('\n2. Seeding Colleges...');
     const colleges = [
-        { name: 'Engineering College', code: 'ENG', address: 'Engineering Campus, Block A', students: 2500 },
-        { name: 'Science College', code: 'SCI', address: 'Science Campus, Block B', students: 1800 },
-        { name: 'Arts College', code: 'ART', address: 'Arts Campus, Block C', students: 1200 },
-        { name: 'Commerce College', code: 'COM', address: 'Commerce Campus, Block D', students: 1500 },
-        { name: 'Management College', code: 'MGT', address: 'Management Campus, Block E', students: 1000 }
+        { name: 'Engineering College', code: 'ENG', address: 'Engineering Campus, Block A' },
+        { name: 'Science College', code: 'SCI', address: 'Science Campus, Block B' },
+        { name: 'Arts College', code: 'ART', address: 'Arts Campus, Block C' },
+        { name: 'Commerce College', code: 'COM', address: 'Commerce Campus, Block D' },
+        { name: 'Management College', code: 'MGT', address: 'Management Campus, Block E' }
     ];
 
     const collegeMap = {};
     for (const college of colleges) {
         const { rows } = await db.query(
-            'INSERT INTO "College" (name, code, address, total_students) VALUES ($1, $2, $3, $4) ON CONFLICT (name) DO UPDATE SET name = $1 RETURNING id, name',
-            [college.name, college.code, college.address, college.students]
+            'INSERT INTO "College" (name, code, address) VALUES ($1, $2, $3) ON CONFLICT (name) DO UPDATE SET name = $1 RETURNING id, name',
+            [college.name, college.code, college.address]
         );
         collegeMap[college.code] = rows[0].id;
-        console.log(`   ✓ College: ${college.name} (${college.code}) - ${college.students} students`);
+        console.log(`   ✓ College: ${college.name} (${college.code})`);
     }
 
     // 3. Seed Departments
     console.log('\n3. Seeding Departments...');
     const departments = [
-        { name: 'Computer Science', code: 'CS', college: 'ENG', students: 800 },
-        { name: 'Electronics', code: 'ECE', college: 'ENG', students: 900 },
-        { name: 'Mechanical', code: 'ME', college: 'ENG', students: 800 },
-        { name: 'Physics', code: 'PHY', college: 'SCI', students: 600 },
-        { name: 'Chemistry', code: 'CHEM', college: 'SCI', students: 600 },
-        { name: 'Mathematics', code: 'MATH', college: 'SCI', students: 600 },
-        { name: 'English Literature', code: 'ENG_LIT', college: 'ART', students: 600 },
-        { name: 'History', code: 'HIST', college: 'ART', students: 600 },
-        { name: 'Accounting', code: 'ACC', college: 'COM', students: 750 },
-        { name: 'Finance', code: 'FIN', college: 'COM', students: 750 },
-        { name: 'Business Administration', code: 'BA', college: 'MGT', students: 500 },
-        { name: 'Marketing', code: 'MKT', college: 'MGT', students: 500 }
+        { name: 'Computer Science', code: 'CS', college: 'ENG' },
+        { name: 'Electronics', code: 'ECE', college: 'ENG' },
+        { name: 'Mechanical', code: 'ME', college: 'ENG' },
+        { name: 'Physics', code: 'PHY', college: 'SCI' },
+        { name: 'Chemistry', code: 'CHEM', college: 'SCI' },
+        { name: 'Mathematics', code: 'MATH', college: 'SCI' },
+        { name: 'English Literature', code: 'ENG_LIT', college: 'ART' },
+        { name: 'History', code: 'HIST', college: 'ART' },
+        { name: 'Accounting', code: 'ACC', college: 'COM' },
+        { name: 'Finance', code: 'FIN', college: 'COM' },
+        { name: 'Business Administration', code: 'BA', college: 'MGT' },
+        { name: 'Marketing', code: 'MKT', college: 'MGT' }
     ];
 
     const deptMap = {};
     for (const dept of departments) {
         const { rows } = await db.query(
-            'INSERT INTO "Department" (name, code, college_id, total_students) VALUES ($1, $2, $3, $4) ON CONFLICT (code) DO UPDATE SET name = $1 RETURNING id, name',
-            [dept.name, dept.code, collegeMap[dept.college], dept.students]
+            'INSERT INTO "Department" (name, code, college_id) VALUES ($1, $2, $3) ON CONFLICT (code) DO UPDATE SET name = $1 RETURNING id, name',
+            [dept.name, dept.code, collegeMap[dept.college]]
         );
         deptMap[dept.code] = rows[0].id;
-        console.log(`   ✓ Department: ${dept.name} → ${dept.college} (${dept.students} students)`);
+        console.log(`   ✓ Department: ${dept.name} → ${dept.college}`);
     }
 
     // 4. Seed Users
@@ -106,8 +106,8 @@ async function seedAll() {
     for (const user of users) {
         const deptId = user.dept ? deptMap[user.dept] : null;
         const { rows } = await db.query(
-            'INSERT INTO "User" (name, email, password, department, dept_id) VALUES ($1, $2, $3, $4, $5) ON CONFLICT (email) DO UPDATE SET name = $1 RETURNING id, name, email',
-            [user.name, user.email, user.password, user.dept || null, deptId]
+            'INSERT INTO "User" (name, email, password, dept_id) VALUES ($1, $2, $3, $4) ON CONFLICT (email) DO UPDATE SET name = $1 RETURNING id, name, email',
+            [user.name, user.email, user.password, deptId]
         );
 
         await db.query(
